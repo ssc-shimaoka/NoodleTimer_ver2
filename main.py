@@ -5,8 +5,8 @@ import music
 ### 変数定義
 ###---------------------------------------------------------------
 appMode                  = 0
-blockNumberExternal      = 0
-blockSurvivalTimeExternal= 0
+blockNumberExternal      = 6
+blockSurvivalTimeExternal= 30
 
 blockNumber       = 6   #ブロック数[1-25]
 blockSurvivalTime = 30  #ブロック生存時間(秒)[1-60]
@@ -22,6 +22,21 @@ pauseEndTime   = 0      #一時停止 終了稼働時間(ミリ秒)
 pauseTotalTime = 0      #一時停止 トータル時間(ミリ秒)
 
 ###---------------------------------------------------------------
+#configファイル読み込み関数
+###---------------------------------------------------------------
+def ReadFile():
+    global blockNumberExternal
+    global blockSurvivalTimeExternal
+
+    with open('config.txt') as my_file:
+        x = my_file.read()
+
+    y = x.replace('\r\n', ',')
+    z = y.split(',')
+    blockNumberExternal = int(z[0])
+    blockSurvivalTimeExternal = int(z[1])
+
+###---------------------------------------------------------------
 #モード選択関数
 ###---------------------------------------------------------------
 def ModeSelect(appMode):
@@ -30,8 +45,8 @@ def ModeSelect(appMode):
 
     if appMode == 0:
         display.scroll("ManualTimer",70)
-        blockNumber = 6
-        blockSurvivalTime = 30
+        blockNumber = blockNumberExternal
+        blockSurvivalTime = blockSurvivalTimeExternal
 
     elif appMode == 1:
         display.scroll("PreSet3min",70)
@@ -53,16 +68,22 @@ def ModeSelect(appMode):
 #ブロック数取得関数
 ###---------------------------------------------------------------
 def GetRemainingBlocks():
+    global elapsedTime
     elapsedTime = running_time() - startTime - pauseTotalTime
-    dispTime = int((setTime - elapsedTime) / updateInterval / blockSurvivalTime)
-    return dispTime
+    print("elapsedTime=",elapsedTime)
+    block = int((setTime - elapsedTime) / updateInterval / blockSurvivalTime)
+    return block
 
 ###---------------------------------------------------------------
 #main loop
 ###---------------------------------------------------------------
 display.show(Image.HAPPY)
 music.play(music.BA_DING)
-
+ReadFile()
+blockNumber = blockNumberExternal
+blockSurvivalTime = blockSurvivalTimeExternal
+print("blockNumber=",blockNumber)
+print("blockSurvivalTime=",blockSurvivalTime)
 while True:
 ###---------------------------------------------------------------
 #A+Bボタン押下
@@ -85,10 +106,12 @@ while True:
             startTime = running_time()
             #タイマー指定時間 設定
             setTime = blockNumber * blockSurvivalTime * updateInterval
-            #タイマー状態更新（未動作→動作中）
-            timerStatus = 1
+            print("setTime=",setTime)
             #出力
             display.scroll("Start",70)
+            #タイマー状態更新（未動作→動作中）
+            timerStatus = 1
+
 ###---------------------------------------------------------------
 #Bボタン押下
 ###---------------------------------------------------------------
@@ -129,7 +152,8 @@ while True:
         blocks = GetRemainingBlocks()
 
         #ブロックが0個になった場合
-        if blocks == 0 :
+        #if blocks == 0 :
+        if setTime < elapsedTime :
             #満了演出
             display.show(Image.HAPPY)
             music.play(music.RINGTONE)
@@ -143,3 +167,4 @@ while True:
         else :
             #点灯LED表示
             display.show(dispTime.BlockArrey[blocks])
+            #print("blocks=",blocks)
