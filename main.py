@@ -4,6 +4,10 @@ import music
 ###---------------------------------------------------------------
 ### 変数定義
 ###---------------------------------------------------------------
+appMode                  = 0
+blockNumberExternal      = 0
+blockSurvivalTimeExternal= 0
+
 blockNumber       = 6   #ブロック数[1-25]
 blockSurvivalTime = 30  #ブロック生存時間(秒)[1-60]
 
@@ -18,11 +22,39 @@ pauseEndTime   = 0      #一時停止 終了稼働時間(ミリ秒)
 pauseTotalTime = 0      #一時停止 トータル時間(ミリ秒)
 
 ###---------------------------------------------------------------
+#モード選択関数
+###---------------------------------------------------------------
+def ModeSelect(appMode):
+    global blockNumber
+    global blockSurvivalTime
+
+    if appMode == 0:
+        display.scroll("ManualTimer",70)
+        blockNumber = 6
+        blockSurvivalTime = 30
+
+    elif appMode == 1:
+        display.scroll("PreSet3min",70)
+        blockNumber = 25
+        blockSurvivalTime = 7.2
+
+    elif appMode == 2:
+        display.scroll("PreSet4min",70)
+        blockNumber = 25
+        blockSurvivalTime = 9.6
+
+    elif appMode == 3:
+        display.scroll("PreSet5min",70)
+        blockNumber = 25
+        blockSurvivalTime = 12
+
+
+###---------------------------------------------------------------
 #ブロック数取得関数
 ###---------------------------------------------------------------
 def GetRemainingBlocks():
     elapsedTime = running_time() - startTime - pauseTotalTime
-    dispTime = int((setTime - elapsedTime) / updateInterval / blockSurvivalTime) + 1
+    dispTime = int((setTime - elapsedTime) / updateInterval / blockSurvivalTime)
     return dispTime
 
 ###---------------------------------------------------------------
@@ -38,8 +70,11 @@ while True:
     if button_a.is_pressed() and button_b.is_pressed():
         #タイマー一時停止状態
         if timerStatus == 2 :
+            display.scroll("Reset",70)
+
             display.show(Image.CHESSBOARD)
             timerStatus = 0
+
 ###---------------------------------------------------------------
 #Aボタン押下
 ###---------------------------------------------------------------
@@ -53,7 +88,7 @@ while True:
             #タイマー状態更新（未動作→動作中）
             timerStatus = 1
             #出力
-            display.scroll("start",50)
+            display.scroll("Start",70)
 ###---------------------------------------------------------------
 #Bボタン押下
 ###---------------------------------------------------------------
@@ -62,14 +97,22 @@ while True:
             #タイマー状態更新（動作中→一時停止）
             timerStatus = 2
             pauseStartTime = running_time()
-            display.scroll("pause",50)
+            display.scroll("Pause",70)
 
         elif timerStatus == 2 :
             #タイマー状態更新（一時停止→動作中）
             timerStatus = 1
             pauseEndTime = running_time()
             pauseTotalTime = pauseTotalTime + (pauseEndTime - pauseStartTime)
-            display.scroll("restart",50)
+            display.scroll("Resume",70)
+
+        #タイマー未動作状態
+        elif timerStatus == 0 :
+            appMode = appMode + 1
+            if(appMode > 3):
+                appMode = 0
+
+            ModeSelect(appMode)
 
 ###---------------------------------------------------------------
 #タイマー未動作状態の処理

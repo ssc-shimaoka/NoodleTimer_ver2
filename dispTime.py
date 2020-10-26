@@ -27,6 +27,6 @@ Block23 = Image("99990:99990:99999:99999:99999")
 Block24 = Image("99990:99999:99999:99999:99999")
 Block25 = Image("99999:99999:99999:99999:99999")
 
-BlockArrey = [Block00,Block01,Block02,Block03,Block04,Block05,Block06,Block07,Block08,Block09,
+BlockArrey = [Block01,Block02,Block03,Block04,Block05,Block06,Block07,Block08,Block09,
               Block10,Block11,Block12,Block13,Block14,Block15,Block16,Block17,Block18,Block19,
               Block20,Block21,Block22,Block23,Block24,Block25]
