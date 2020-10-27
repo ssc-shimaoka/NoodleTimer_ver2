@@ -69,7 +69,7 @@ def ModeSelect(appMode):
 ###---------------------------------------------------------------
 def GetRemainingBlocks():
     global elapsedTime
-    elapsedTime = running_time() - startTime - pauseTotalTime
+    elapsedTime = (running_time() - startTime) - pauseTotalTime
     print("elapsedTime=",elapsedTime)
     block = int((setTime - elapsedTime) / updateInterval / blockSurvivalTime)
     return block
@@ -104,6 +104,7 @@ while True:
         if timerStatus == 0 :
             #タイマー開始時間に現在の時刻を代入（ミリ秒）
             startTime = running_time()
+            print("startTime=",startTime)
             #タイマー指定時間 設定
             setTime = blockNumber * blockSurvivalTime * updateInterval
             print("setTime=",setTime)
@@ -160,6 +161,10 @@ while True:
 
             #状態初期化
             sleep(3000)
+            elapsedTime    = 0
+            pauseStartTime = 0
+            pauseEndTime   = 0
+            pauseTotalTime = 0
             display.show(Image.CHESSBOARD)
             timerStatus = 0
 
