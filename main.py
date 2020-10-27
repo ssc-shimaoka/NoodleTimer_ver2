@@ -7,10 +7,9 @@ import music
 appMode                  = 0
 blockNumberExternal      = 6
 blockSurvivalTimeExternal= 30
-
 blockNumber       = 6   #ブロック数[1-25]
 blockSurvivalTime = 30  #ブロック生存時間(秒)[1-60]
-
+#temperature = 40        #自動Start用温度
 timerStatus    = 0      #タイマー状態
 setTime        = 0      #設定時間(ミリ秒)
 operatingTime  = 0      #稼動時間(ミリ秒)
@@ -33,8 +32,18 @@ def ReadFile():
 
     y = x.replace('\r\n', ',')
     z = y.split(',')
+
     blockNumberExternal = int(z[0])
+    if blockNumberExternal < 1:
+        blockNumberExternal = 1
+    if blockNumberExternal > 25:
+        blockNumberExternal = 25
+
     blockSurvivalTimeExternal = int(z[1])
+    if blockSurvivalTimeExternal < 1:
+        blockSurvivalTimeExternal = 1
+    if blockSurvivalTimeExternal > 60:
+        blockSurvivalTimeExternal = 60
 
 ###---------------------------------------------------------------
 #モード選択関数
@@ -63,7 +72,6 @@ def ModeSelect(appMode):
         blockNumber = 25
         blockSurvivalTime = 12
 
-
 ###---------------------------------------------------------------
 #ブロック数取得関数
 ###---------------------------------------------------------------
@@ -71,6 +79,7 @@ def GetRemainingBlocks():
     global elapsedTime
     elapsedTime = (running_time() - startTime) - pauseTotalTime
     print("elapsedTime=",elapsedTime)
+
     block = int((setTime - elapsedTime) / updateInterval / blockSurvivalTime)
     return block
 
@@ -84,6 +93,7 @@ blockNumber = blockNumberExternal
 blockSurvivalTime = blockSurvivalTimeExternal
 print("blockNumber=",blockNumber)
 print("blockSurvivalTime=",blockSurvivalTime)
+
 while True:
 ###---------------------------------------------------------------
 #A+Bボタン押下
@@ -92,7 +102,6 @@ while True:
         #タイマー一時停止状態
         if timerStatus == 2 :
             display.scroll("Reset",70)
-
             display.show(Image.CHESSBOARD)
             timerStatus = 0
 
@@ -172,4 +181,25 @@ while True:
         else :
             #点灯LED表示
             display.show(dispTime.BlockArrey[blocks])
-            #print("blocks=",blocks)
+
+####---------------------------------------------------------------
+##温度センサー
+####---------------------------------------------------------------
+#while True:
+#    global temp
+#    #sleep(1000)
+#    temp = temperature()
+#    print("temp=",temp)
+#    if int(temp) >= temperature:
+#        #タイマー未動作状態
+#        if timerStatus == 0 :
+#            #タイマー開始時間に現在の時刻を代入（ミリ秒）
+#            startTime = running_time()
+#            print("startTime=",startTime)
+#            #タイマー指定時間 設定
+#            setTime = blockNumber * blockSurvivalTime * updateInterval
+#            print("setTime=",setTime)
+#            #出力
+#            display.scroll("Start",70)
+#            #タイマー状態更新（未動作→動作中）
+#            timerStatus = 1
