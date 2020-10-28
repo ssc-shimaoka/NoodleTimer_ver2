@@ -77,7 +77,7 @@ def ModeSelect(appMode):
 ###---------------------------------------------------------------
 def GetRemainingBlocks():
     global elapsedTime
-    elapsedTime = (running_time() - startTime) - pauseTotalTime
+    elapsedTime = (running_time() - startTime) - int(pauseTotalTime)
     print("elapsedTime=",elapsedTime)
 
     block = int((setTime - elapsedTime) / updateInterval / blockSurvivalTime)
@@ -88,6 +88,7 @@ def GetRemainingBlocks():
 ###---------------------------------------------------------------
 display.show(Image.HAPPY)
 music.play(music.BA_DING)
+
 ReadFile()
 blockNumber = blockNumberExternal
 blockSurvivalTime = blockSurvivalTimeExternal
@@ -101,6 +102,7 @@ while True:
     if button_a.is_pressed() and button_b.is_pressed():
         #タイマー一時停止状態
         if timerStatus == 2 :
+            #LCD表示
             display.scroll("Reset",70)
             display.show(Image.CHESSBOARD)
             timerStatus = 0
@@ -111,14 +113,15 @@ while True:
     elif button_a.is_pressed():
         #タイマー未動作状態
         if timerStatus == 0 :
+            #LCD表示
+            display.scroll("Start",70)
+
             #タイマー開始時間に現在の時刻を代入（ミリ秒）
             startTime = running_time()
             print("startTime=",startTime)
             #タイマー指定時間 設定
             setTime = blockNumber * blockSurvivalTime * updateInterval
             print("setTime=",setTime)
-            #出力
-            display.scroll("Start",70)
             #タイマー状態更新（未動作→動作中）
             timerStatus = 1
 
@@ -127,17 +130,19 @@ while True:
 ###---------------------------------------------------------------
     elif button_b.is_pressed():
         if timerStatus == 1 :
+            #LCD表示
+            display.scroll("Pause",70)
             #タイマー状態更新（動作中→一時停止）
             timerStatus = 2
             pauseStartTime = running_time()
-            display.scroll("Pause",70)
 
         elif timerStatus == 2 :
+            #LCD表示
+            display.scroll("Resume",70)
             #タイマー状態更新（一時停止→動作中）
-            timerStatus = 1
             pauseEndTime = running_time()
             pauseTotalTime = pauseTotalTime + (pauseEndTime - pauseStartTime)
-            display.scroll("Resume",70)
+            timerStatus = 1
 
         #タイマー未動作状態
         elif timerStatus == 0 :
