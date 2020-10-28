@@ -27,8 +27,13 @@ def ReadFile():
     global blockNumberExternal
     global blockSurvivalTimeExternal
 
-    with open('config.txt') as my_file:
-        x = my_file.read()
+    try:
+        with open('config.txt') as my_file:
+            x = my_file.read()
+    except:
+        blockNumber = 6
+        blockSurvivalTime = 30
+        return
 
     y = x.replace('\r\n', ',')
     z = y.split(',')
